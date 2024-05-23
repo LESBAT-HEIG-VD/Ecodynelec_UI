@@ -184,7 +184,7 @@ if main_option == "Données de mix":
                 bar_consumption(raw_consumption_by_src_annual_df,title=f'Yearly consumption by source in {selected_country_name}')
 
 
-            electricity_impact_by_src_annual_df = electricity_impact_by_src_selected_df.resample('Y').sum() / 1000
+            electricity_impact_by_src_annual_df = electricity_impact_by_src_selected_df.resample('Y').mean()
             electricity_impact_by_src_annual_df = aggregate_by_country(selected_country_name,electricity_impact_by_src_annual_df)
             electricity_impact_by_src_annual_df.index = electricity_impact_by_src_annual_df.index.year
 
@@ -228,7 +228,7 @@ if main_option == "Données de mix":
 
                 bar_group_consumption(mix_import_annual, title=f"Origins of yearly Swiss consumer mix in {selected_country_name}",
                                       text="GWh",
-                                      y_cols=ordered_countries, barmode='group')
+                                      y_cols=ordered_countries, barmode='stack')
 
 
             mix_impact_annual = tot_electricity_impact_selected_df.drop(['sum'], axis=1).resample('Y').mean()
@@ -236,7 +236,7 @@ if main_option == "Données de mix":
             with col2:
 
                 bar_group_consumption(mix_impact_annual,title=f'Yearly average of GHG emissions  in {selected_country_name} by country',
-                                      text="gCO2eq/kWh",y_cols=ordered_countries, barmode='group')
+                                      text="gCO2eq/kWh",y_cols=ordered_countries, barmode='stack')
 
 
 
@@ -314,7 +314,7 @@ if main_option == "Données de mix":
                 bar_group_consumption(monthly_mix_import,
                                       title=f"Origins of monthly consumer mix in {selected_country_name}",
                                       text="GWh",
-                                      y_cols=ordered_countries, barmode='group')
+                                      y_cols=ordered_countries, barmode='stack')
 
             tot_electricity_impact_monthly_df = tot_electricity_impact_selected_df[(tot_electricity_impact_selected_df.index.year == selected_year)]
             monthly_mix_impact = tot_electricity_impact_monthly_df.drop(['sum'], axis=1).resample('M').mean()
@@ -324,7 +324,7 @@ if main_option == "Données de mix":
                 bar_group_consumption(monthly_mix_impact,
                                       title=f'Monthly average of GHG emissions  in {selected_country_name}',
                                       text="gCO2eq/kWh",
-                                      y_cols=ordered_countries, barmode='group')
+                                      y_cols=ordered_countries, barmode='stack')
 
 
     elif resolution == 'Quotidien':
