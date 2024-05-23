@@ -11,7 +11,7 @@ from plotly.subplots import make_subplots
 
 
 
-
+ordered_countries = ['CH', 'DE', 'FR', 'AT', 'IT', 'Other']
 
 
 def create_combined_time_series(flows_df, consumption_df, title):
