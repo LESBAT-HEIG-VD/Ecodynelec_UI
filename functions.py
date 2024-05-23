@@ -237,6 +237,19 @@ def process_data_by_month(df, selected_year, country_name, month_dict, aggregati
 
     return df_aggregated
 
+def process_ghg_data_by_month(df, selected_year, country_name, month_dict, aggregation_function):
+
+    # Filter data for the selected year
+    df_filtered = df[df.index.year == selected_year]
+    # Resample monthly, sum and convert units
+    df_monthly = df_filtered.resample('M').mean()
+    # Aggregate by country
+    df_aggregated = aggregation_function(country_name, df_monthly)
+    # Remap the index to month names
+    df_aggregated.index = df_aggregated.index.month.map(lambda x: month_dict[x])
+
+    return df_aggregated
+
 
 
 

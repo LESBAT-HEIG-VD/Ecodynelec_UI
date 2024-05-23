@@ -8,7 +8,7 @@ from plotly.subplots import make_subplots
 from functions import create_combined_time_series
 from functions import (create_area_chart, create_combined_time_series, create_area_mixte, aggregation_menu,
                        create_column_mapping, group_by_src, sum_columns_with_suffix, aggregate_by_country,
-                       process_data_by_month, create_pivot_table, create_heatmap, bar_group_consumption, bar_group_ghg, bar_consumption, bar_ghg)
+                       process_data_by_month, create_pivot_table, create_heatmap, bar_group_consumption, bar_group_ghg,process_ghg_data_by_month, bar_consumption, bar_ghg)
 
 
 # Configuration de la page Streamlit
@@ -205,7 +205,7 @@ if main_option == "Données de mix":
                                       y_cols=techno_annual_df.columns,barmode='stack')
 
 
-            techno_impact_annual_df=techno_impact_selected_df.resample('Y').sum() / 1000
+            techno_impact_annual_df=techno_impact_selected_df.resample('Y').mean()
             techno_impact_annual_df.index = techno_impact_annual_df.index.year
 
             with col2:
@@ -277,7 +277,7 @@ if main_option == "Données de mix":
             raw_consumption_by_src_monthly_df = process_data_by_month(raw_consumption_by_src_selected_df, selected_year, selected_country_name, month_dict,
                 aggregate_by_country)
 
-            electricity_impact_by_src_monthly_df = process_data_by_month(electricity_impact_by_src_selected_df, selected_year, selected_country_name, month_dict,
+            electricity_impact_by_src_monthly_df = process_ghg_data_by_month(electricity_impact_by_src_selected_df, selected_year, selected_country_name, month_dict,
                 aggregate_by_country)
 
             col1, col2 = st.columns(2)
@@ -294,7 +294,7 @@ if main_option == "Données de mix":
             with col1:
                 bar_consumption(techno_monthly_df,title=f'Monthly consumption by technology in {selected_country_name}')
             techno_impact_monthly_df = techno_impact_selected_df.loc[techno_impact_selected_df.index.year == selected_year]
-            techno_impact_monthly_df = techno_impact_monthly_df.resample('M').sum() / 1000
+            techno_impact_monthly_df = techno_impact_monthly_df.resample('M').mean()
             techno_impact_monthly_df.index = techno_impact_monthly_df.index.month.map(lambda x: month_dict[x])
 
             with col2:
@@ -381,9 +381,9 @@ if main_option == "Données de mix":
 
             electricity_impact_by_src_daily_df = electricity_impact_by_src_selected_df.loc[(electricity_impact_by_src_selected_df.index >= start_date) & (
                         electricity_impact_by_src_selected_df.index <= end_date)].resample('D').sum()
-            electricity_impact_by_src_daily_df = electricity_impact_by_src_daily_df.resample('D').sum() / 1000
+            electricity_impact_by_src_daily_df = electricity_impact_by_src_daily_df.resample('D').mean()
             electricity_impact_by_src_daily_df = aggregate_by_country(selected_country_name,
-                                                                     raw_consumption_by_src_daily_df)
+                                                                     electricity_impact_by_src_daily_df)
             with col2:
                 create_area_mixte(electricity_impact_by_src_daily_df,title=f'Daily average of GHG emissions by source in {selected_country_name}',text='gCO2/KWh')
         if selection == "Technologie":
@@ -397,7 +397,7 @@ if main_option == "Données de mix":
                                               title=f'Daily consumption by technology in {selected_country_name}',text='GWh')
 
             techno_impact_daily_df = techno_impact_selected_df.loc[(techno_impact_selected_df.index >= start_date) &
-                                                                                           (techno_impact_selected_df.index <= end_date)].resample('D').sum() / 1000
+                                                                                           (techno_impact_selected_df.index <= end_date)].resample('D').mean()
 
 
 
@@ -478,7 +478,7 @@ if main_option == "Données de mix":
 
             electricity_impact_by_src_hourly_df = electricity_impact_by_src_selected_df.loc[(electricity_impact_by_src_selected_df.index >= start_date) & (
                         electricity_impact_by_src_selected_df.index <= end_date)].resample('H').sum()
-            electricity_impact_by_src_hourly_df = electricity_impact_by_src_hourly_df.resample('H').sum() / 1000
+            electricity_impact_by_src_hourly_df = electricity_impact_by_src_hourly_df.resample('H').mean()
             electricity_impact_by_src_hourly_df = aggregate_by_country(selected_country_name,
                                                                       electricity_impact_by_src_hourly_df)
             with col2:
@@ -501,7 +501,7 @@ if main_option == "Données de mix":
             with col2:
                 techno_impact_hourly_df = techno_impact_selected_df.loc[
                                               (techno_impact_selected_df.index >= start_date) &
-                                              (techno_impact_selected_df.index <= end_date)].resample('D').sum() / 1000
+                                              (techno_impact_selected_df.index <= end_date)].resample('D').mean()
 
                 create_area_mixte(techno_impact_hourly_df,
                                    title=f'Hourly average of GHG emissions by technology in {selected_country_name}',text='gCO2/KWh')
