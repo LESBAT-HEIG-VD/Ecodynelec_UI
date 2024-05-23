@@ -25,7 +25,7 @@ st.set_page_config(page_title="Ecodynelec", page_icon=":bar_chart:", layout="wid
 with st.sidebar:
     main_option = option_menu(
         menu_title="Main Menu",  # Main menu title
-        options=["Données de mix", "Applications", "Mode expert", "Méthodologie"],  # Main menu options
+        options=["Données de mix"], # "Applications", "Mode expert", "Méthodologie"],  # Main menu options
         icons=["database", "layers", "gear", "info-circle"],  # Optional icons
         menu_icon="cast",  # Main menu icon
         default_index=0,  # Default active index
