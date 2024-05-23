@@ -384,3 +384,16 @@ def bar_ghg(df,title):
     fig.update_layout(legend=dict(x=1, y=-0.2, xanchor='right', yanchor='top', orientation='h'))
     st.plotly_chart(fig)
 
+
+def download_data_as_csv(dataframe, file_name):
+    # Convertir le DataFrame en CSV
+    data_as_csv = dataframe.to_csv(index=True).encode("utf-8")
+
+    # Créer le bouton de téléchargement pour le fichier CSV
+    st.download_button(
+        label="Download data as CSV",
+        data=data_as_csv,
+        file_name=file_name,
+        mime="text/csv"
+    )
+

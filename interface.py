@@ -8,7 +8,8 @@ from plotly.subplots import make_subplots
 from functions import create_combined_time_series
 from functions import (create_area_chart, create_combined_time_series, create_area_mixte, aggregation_menu,
                        create_column_mapping, group_by_src, sum_columns_with_suffix, aggregate_by_country,
-                       process_data_by_month, create_pivot_table, create_heatmap, bar_group_consumption, bar_group_ghg,process_ghg_data_by_month, bar_consumption, bar_ghg)
+                       process_data_by_month, create_pivot_table, create_heatmap, bar_group_consumption,
+                       bar_group_ghg,process_ghg_data_by_month, bar_consumption, bar_ghg,download_data_as_csv)
 
 
 # Configuration de la page Streamlit
@@ -167,10 +168,14 @@ if main_option == "Données de mix":
 
             bar_group_consumption(flows_annual_df, title=f'Yearly Time Series of Production, Imports, and Exports ', text="GWh",
                                   y_cols=['total_consumption', 'production', 'imports', 'exports'], barmode='group')
+            download_data_as_csv(flows_annual_df, "flows_annual_df.csv")
         # pour les impacts
-        consumer_impact_annual = tot_electricity_impact_selected_df['sum'].resample('Y',label='left').mean()
+        consumer_impact_annual = tot_electricity_impact_selected_df['sum'].resample('Y').mean()
+        consumer_impact_annual.index = consumer_impact_annual.index.year
         with col2:
             bar_group_ghg(consumer_impact_annual, f'Yearly average of GHG emissions  in {selected_country_name}')
+            download_data_as_csv(consumer_impact_annual, "consumer_impact_annual.csv")
+
 
 
         selection = aggregation_menu()
@@ -182,7 +187,7 @@ if main_option == "Données de mix":
             with col1:
 
                 bar_consumption(raw_consumption_by_src_annual_df,title=f'Yearly consumption by source in {selected_country_name}')
-
+                download_data_as_csv(raw_consumption_by_src_annual_df, "raw_consumption_by_src_annual_df.csv")
 
             electricity_impact_by_src_annual_df = electricity_impact_by_src_selected_df.resample('Y').mean()
             electricity_impact_by_src_annual_df = aggregate_by_country(selected_country_name,electricity_impact_by_src_annual_df)
@@ -191,6 +196,7 @@ if main_option == "Données de mix":
             with col2:
 
                 bar_ghg(electricity_impact_by_src_annual_df, f'Yearly average of GHG emissions  in {selected_country_name} by source')
+                download_data_as_csv(electricity_impact_by_src_annual_df, "electricity_impact_by_src_annual_df.csv")
         if selection == "Technologie":
             col1, col2 = st.columns(2)
 
@@ -203,6 +209,7 @@ if main_option == "Données de mix":
                                       title=f'Yearly consumption by technology  in {selected_country_name}',
                                       text="GWh",
                                       y_cols=techno_annual_df.columns,barmode='stack')
+                download_data_as_csv(techno_annual_df, "techno_annual_df.csv")
 
 
             techno_impact_annual_df=techno_impact_selected_df.resample('Y').mean()
@@ -214,6 +221,7 @@ if main_option == "Données de mix":
                                       title=f'Yearly average of GHG emissions by technology in {selected_country_name}',
                                       text="gCO2eq/kWh",
                                       y_cols=techno_impact_annual_df.columns, barmode='stack')
+                download_data_as_csv(techno_impact_annual_df, "techno_impact_annual_df.csv")
 
 
         if selection == "Pays d'origine":
@@ -229,6 +237,7 @@ if main_option == "Données de mix":
                 bar_group_consumption(mix_import_annual, title=f"Origins of yearly Swiss consumer mix in {selected_country_name}",
                                       text="GWh",
                                       y_cols=ordered_countries, barmode='stack')
+                download_data_as_csv(mix_import_annual, "mix_import_annual.csv")
 
 
             mix_impact_annual = tot_electricity_impact_selected_df.drop(['sum'], axis=1).resample('Y').mean()
@@ -237,6 +246,7 @@ if main_option == "Données de mix":
 
                 bar_group_consumption(mix_impact_annual,title=f'Yearly average of GHG emissions  in {selected_country_name} by country',
                                       text="gCO2eq/kWh",y_cols=ordered_countries, barmode='stack')
+                download_data_as_csv(mix_impact_annual, "mix_impact_annual.csv")
 
 
 
@@ -261,6 +271,7 @@ if main_option == "Données de mix":
             bar_group_consumption(flows_monthly_df, title=f'Monthly Time Series of Production, Imports, and Exports ',
                                   text="GWh",
                                   y_cols=['total_consumption', 'production', 'imports', 'exports'], barmode='group')
+            download_data_as_csv(flows_monthly_df, "flows_monthly_df.csv")
 
 
             # pour les impacts
@@ -270,6 +281,7 @@ if main_option == "Données de mix":
         with col2:
 
             bar_group_ghg(monthly_consumer_impact, f'Monthly average of GHG emissions  in {selected_country_name}')
+            download_data_as_csv(monthly_consumer_impact, "monthly_consumer_impact.csv")
 
         selection = aggregation_menu()
         if selection == "Mixte":
@@ -283,8 +295,10 @@ if main_option == "Données de mix":
             col1, col2 = st.columns(2)
             with col1:
                 bar_consumption(raw_consumption_by_src_monthly_df,title=f'Monthly consumption by source in {selected_country_name}')
+                download_data_as_csv(raw_consumption_by_src_monthly_df, "raw_consumption_by_src_monthly_df.csv")
             with col2:
                 bar_ghg(electricity_impact_by_src_monthly_df,f'Monthly average of GHG emissions  in {selected_country_name} by source')
+                download_data_as_csv(electricity_impact_by_src_monthly_df, "electricity_impact_by_src_monthly_df.csv")
         if selection == "Technologie":
 
             techno_monthly_df = techno_selected_df.loc[techno_selected_df.index.year == selected_year]
@@ -293,12 +307,14 @@ if main_option == "Données de mix":
             col1, col2 = st.columns(2)
             with col1:
                 bar_consumption(techno_monthly_df,title=f'Monthly consumption by technology in {selected_country_name}')
+                download_data_as_csv(techno_monthly_df, "techno_monthly_df.csv")
             techno_impact_monthly_df = techno_impact_selected_df.loc[techno_impact_selected_df.index.year == selected_year]
             techno_impact_monthly_df = techno_impact_monthly_df.resample('M').mean()
             techno_impact_monthly_df.index = techno_impact_monthly_df.index.month.map(lambda x: month_dict[x])
 
             with col2:
                 bar_ghg(techno_impact_monthly_df,f'Monthly average  of GHG emissions by technology in {selected_country_name}')
+                download_data_as_csv(techno_impact_monthly_df, "techno_impact_monthly_df.csv")
 
 
 
@@ -315,6 +331,7 @@ if main_option == "Données de mix":
                                       title=f"Origins of monthly consumer mix in {selected_country_name}",
                                       text="GWh",
                                       y_cols=ordered_countries, barmode='stack')
+                download_data_as_csv(monthly_mix_import, "monthly_mix_import.csv")
 
             tot_electricity_impact_monthly_df = tot_electricity_impact_selected_df[(tot_electricity_impact_selected_df.index.year == selected_year)]
             monthly_mix_impact = tot_electricity_impact_monthly_df.drop(['sum'], axis=1).resample('M').mean()
@@ -325,6 +342,7 @@ if main_option == "Données de mix":
                                       title=f'Monthly average of GHG emissions  in {selected_country_name}',
                                       text="gCO2eq/kWh",
                                       y_cols=ordered_countries, barmode='stack')
+                download_data_as_csv(monthly_mix_impact, "monthly_mix_impact.csv")
 
 
     elif resolution == 'Quotidien':
@@ -351,12 +369,13 @@ if main_option == "Données de mix":
 
 
         # Filtrer le DataFrame selon la plage sélectionnée
-        flows_daily= flows_selected_df.loc[(flows_selected_df.index >= start_date) & (flows_selected_df.index <= end_date)].resample('D',label='left').sum() / 1000
+        flows_daily= flows_selected_df.loc[(flows_selected_df.index >= start_date) & (flows_selected_df.index <= end_date)].resample('D').sum() / 1000
         tot_consumption_daily= tot_consumption_selected_df.loc[(tot_consumption_selected_df.index >= start_date) & (tot_consumption_selected_df.index <= end_date)].resample('D').sum()
-        tot_consumption_daily=tot_consumption_daily['sum'].resample('D',label='left').sum() / 1000
+        tot_consumption_daily=tot_consumption_daily['sum'].resample('D').sum() / 1000
         col1, col2 = st.columns(2)
         with col1:
             create_combined_time_series(flows_daily, tot_consumption_daily, title=f'Daily Time Series of Production, Imports, and Exports ')
+            download_data_as_csv(flows_daily, "flows_daily.csv")
 
 
         # pour les impacts
@@ -366,6 +385,7 @@ if main_option == "Données de mix":
         pivot_table=create_pivot_table(tot_electricity_impact_daily_df['sum'].resample('H').mean())
         with col2:
             create_heatmap(pivot_table, f' Heatmap of the average of GHG emissions  in {selected_country_name}')
+            download_data_as_csv(pivot_table, "tot_electricity_impact_daily_df.csv")
 
         selection = aggregation_menu()
         if selection == "Mixte":
@@ -378,6 +398,7 @@ if main_option == "Données de mix":
             with col1:
                 create_area_mixte(raw_consumption_by_src_daily_df,
                                   title=f'Daily consumption by source in {selected_country_name}',text='GWh')
+                download_data_as_csv(raw_consumption_by_src_daily_df, "raw_consumption_by_src_daily_df.csv")
 
             electricity_impact_by_src_daily_df = electricity_impact_by_src_selected_df.loc[(electricity_impact_by_src_selected_df.index >= start_date) & (
                         electricity_impact_by_src_selected_df.index <= end_date)].resample('D').sum()
@@ -386,6 +407,7 @@ if main_option == "Données de mix":
                                                                      electricity_impact_by_src_daily_df)
             with col2:
                 create_area_mixte(electricity_impact_by_src_daily_df,title=f'Daily average of GHG emissions by source in {selected_country_name}',text='gCO2/KWh')
+                download_data_as_csv(electricity_impact_by_src_daily_df, "electricity_impact_by_src_daily_df.csv")
         if selection == "Technologie":
 
             col1, col2 = st.columns(2)  # Crée deux colonnes pour les graphiques
@@ -395,6 +417,7 @@ if main_option == "Données de mix":
                 #create_time_series(techno_daily_df,title=f'Daily average of GHG emissions by source in {selected_country_name}')
                 create_area_mixte(techno_daily_df,
                                               title=f'Daily consumption by technology in {selected_country_name}',text='GWh')
+                download_data_as_csv(techno_daily_df, "techno_daily_df.csv")
 
             techno_impact_daily_df = techno_impact_selected_df.loc[(techno_impact_selected_df.index >= start_date) &
                                                                                            (techno_impact_selected_df.index <= end_date)].resample('D').mean()
@@ -404,6 +427,7 @@ if main_option == "Données de mix":
             with col2:
                 create_area_mixte(techno_impact_daily_df,
                                               title=f'Daily average of GHG emissions by technology in {selected_country_name}', text='gCO2/KWh')
+                download_data_as_csv(techno_impact_daily_df, "techno_impact_daily_df.csv")
 
 
 
@@ -417,6 +441,7 @@ if main_option == "Données de mix":
             col1, col2 = st.columns(2)
             with col1:
                 create_area_chart(daily_mix_import,title=f"Origins of daily consumer mix by country in {selected_country_name}")
+                download_data_as_csv(daily_mix_import, "daily_mix_import.csv")
 
             tot_electricity_impact_daily_df = tot_electricity_impact_selected_df[(tot_electricity_impact_selected_df.index >= start_date) &
                                                                                  (tot_electricity_impact_selected_df.index <= end_date)]
@@ -424,6 +449,7 @@ if main_option == "Données de mix":
             daily_mix_impact = tot_electricity_impact_daily_df.drop(['sum'], axis=1).resample('D').mean()
             with col2:
                 create_area_chart(daily_mix_impact, title=f'Daily average of GHG emissions by country (gCO2eq/kWh) in {selected_country_name}')
+                download_data_as_csv(daily_mix_impact, "daily_mix_impact.csv")
 
 
     elif resolution == 'Horaire':
@@ -455,6 +481,7 @@ if main_option == "Données de mix":
         col1,col2= st.columns(2)
         with col1:
             create_combined_time_series(flows_hourly, tot_consumption_hourly, title=f'Hourly Time Series of Production, Imports, and Exports ')
+            download_data_as_csv(flows_hourly, "flows_hourly.csv")
 
 
         # pour les impacts
@@ -465,6 +492,7 @@ if main_option == "Données de mix":
         pivot_table = create_pivot_table(tot_electricity_impact_hourly_df['sum'].resample('H').mean())
         with col2:
             create_heatmap(pivot_table, f' Heatmap of the average of GHG emissions  in {selected_country_name}')
+            download_data_as_csv(pivot_table, "tot_electricity_impact_hourly_df.csv")
         selection = aggregation_menu()
         if selection == "Mixte":
             raw_consumption_by_src_hourly_df = raw_consumption_by_src_selected_df.loc[(raw_consumption_by_src_selected_df.index >= start_date) & (
@@ -475,6 +503,7 @@ if main_option == "Données de mix":
             with col1:
                 create_area_mixte(raw_consumption_by_src_hourly_df,
                                               title=f'Hourly consumption by source in {selected_country_name}',text='GWh')
+                download_data_as_csv(raw_consumption_by_src_hourly_df, "raw_consumption_by_src_hourly_df.csv")
 
             electricity_impact_by_src_hourly_df = electricity_impact_by_src_selected_df.loc[(electricity_impact_by_src_selected_df.index >= start_date) & (
                         electricity_impact_by_src_selected_df.index <= end_date)].resample('H').sum()
@@ -484,6 +513,7 @@ if main_option == "Données de mix":
             with col2:
                 create_area_mixte(electricity_impact_by_src_hourly_df,
                                       title=f'Hourly average of GHG emissions by source in {selected_country_name}',text='gCO2/KWh')
+                download_data_as_csv(electricity_impact_by_src_hourly_df, "electricity_impact_by_src_hourly_df.csv")
 
 
         if selection == "Technologie":
@@ -497,6 +527,7 @@ if main_option == "Données de mix":
 
                 create_area_mixte(techno_hourly_df,
                                title=f'Daily average of GHG emissions by technology in {selected_country_name}',text='GWh')
+                download_data_as_csv(techno_hourly_df, "techno_hourly_df.csv")
 
             with col2:
                 techno_impact_hourly_df = techno_impact_selected_df.loc[
@@ -505,6 +536,7 @@ if main_option == "Données de mix":
 
                 create_area_mixte(techno_impact_hourly_df,
                                    title=f'Hourly average of GHG emissions by technology in {selected_country_name}',text='gCO2/KWh')
+                download_data_as_csv(techno_impact_hourly_df, "techno_impact_hourly_df.csv")
 
         if selection == "Pays d'origine":
             tot_electricity_mix_hourly_df = tot_electricity_mix_selected_df.loc[
@@ -516,6 +548,7 @@ if main_option == "Données de mix":
             col1, col2 = st.columns(2)
             with col1:
                 create_area_chart(hourly_mix_import,title=f"Origins of hourly consumer mix by country in {selected_country_name}")
+                download_data_as_csv(hourly_mix_import, "hourly_mix_import.csv")
 
             tot_electricity_impact_hourly_df = tot_electricity_impact_selected_df[(tot_electricity_impact_selected_df.index >= start_date) &
                                                                                  (tot_electricity_impact_selected_df.index <= end_date)]
@@ -523,6 +556,7 @@ if main_option == "Données de mix":
             hourly_mix_impact = tot_electricity_impact_hourly_df.drop(['sum'], axis=1).resample('H').mean()
             with col2:
                 create_area_chart(hourly_mix_impact, title=f'Hourly average of GHG emissions by country in {selected_country_name}')
+                download_data_as_csv(hourly_mix_impact, "hourly_mix_impact.csv")
 
 
 
