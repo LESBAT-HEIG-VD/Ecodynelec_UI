@@ -33,7 +33,7 @@ def create_combined_time_series(flows_df, consumption_df, title):
     fig.add_trace(go.Scatter(x=flows_df.index, y=flows_df['exports'], mode='lines', name='Exports'))
     fig.add_trace(go.Scatter(x=flows_df.index, y=flows_df['total_consumption'], mode='lines', name='total_consumption'))
     # Ajout de la série de données de consommation totale
-    fig.add_trace(go.Scatter(x=consumption_df.index, y=consumption_df, mode='lines', name='Total Consumption'))
+    #fig.add_trace(go.Scatter(x=consumption_df.index, y=consumption_df, mode='lines', name='Total Consumption'))
 
     # Mise à jour des axes et du layout
     fig.update_layout(

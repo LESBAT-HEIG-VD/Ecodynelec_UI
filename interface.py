@@ -401,7 +401,7 @@ if main_option == "Données de mix":
                 download_data_as_csv(raw_consumption_by_src_daily_df, "raw_consumption_by_src_daily_df.csv")
 
             electricity_impact_by_src_daily_df = electricity_impact_by_src_selected_df.loc[(electricity_impact_by_src_selected_df.index >= start_date) & (
-                        electricity_impact_by_src_selected_df.index <= end_date)].resample('D').sum()
+                        electricity_impact_by_src_selected_df.index <= end_date)]
             electricity_impact_by_src_daily_df = electricity_impact_by_src_daily_df.resample('D').mean()
             electricity_impact_by_src_daily_df = aggregate_by_country(selected_country_name,
                                                                      electricity_impact_by_src_daily_df)
