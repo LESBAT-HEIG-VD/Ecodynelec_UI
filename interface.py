@@ -736,7 +736,7 @@ if main_option == "Mix data":
 
 
 
-        # Display the chart based on user's choice
+        # disp the chart based on user's choice
         with col2:
 
                 # Create a line plot (assuming you want to use Plotly)
